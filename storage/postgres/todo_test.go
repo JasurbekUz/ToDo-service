@@ -222,8 +222,8 @@ func TestTodoRepo_Delete(t *testing.T) {
 }
 
 func TestTodoRepo_ListOverdue(t *testing.T) {
-	layoutISO := "2006-01-02"
-	toTime, err := time.Parse(layoutISO, "2021-12-10")
+	fmtTime := "2006-01-02"
+	toTime, err := time.Parse(fmtTime, "2021-12-10")
 	if err != nil {
 		t.Fatal("failed to time parse", err)
 	}

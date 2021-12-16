@@ -80,8 +80,8 @@ func (s *TodoService) Delete(ctx context.Context, req *pb.ByIdReq) (*pb.Empty, e
 }
 
 func (s *TodoService) ListOverdue(ctx context.Context, req *pb.ListTime) (*pb.ListResp, error) {
-	layoutISO := "2006-01-02"
-	time, err := time.Parse(layoutISO, req.ToTime)
+	fmtTime := "2006-01-02"
+	time, err := time.Parse(fmtTime, req.ToTime)
 	if err != nil {
 		s.logger.Error("failed to time parse", l.Error(err))
 	}
