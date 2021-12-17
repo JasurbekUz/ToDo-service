@@ -26,7 +26,7 @@ func (suite *TodoRepositoryTestSuite) SetupSuite() {
 
 // All methods that begin with "Test" are run as tests within a
 // suite.
-func (suite *UserRepositoryTestSuite) TestTodoCRUD() {
+func (suite *TodoRepositoryTestSuite) TestTodoCRUD() {
 	id := "0d512776-60ed-4980-b8a3-6904a2234fd4"
 
 	todo := pb.Todo{
@@ -41,7 +41,7 @@ func (suite *UserRepositoryTestSuite) TestTodoCRUD() {
 	_ = suite.Repository.Delete(id)
 
 	// Creating_Test_Part
-	user, err := suite.Repository.Create(todo)
+	todo, err := suite.Repository.Create(todo)
 	suite.Nil(err)
 
 	// Getting_Test_Part
@@ -59,7 +59,7 @@ func (suite *UserRepositoryTestSuite) TestTodoCRUD() {
 	getTodo, err = suite.Repository.Get(id)
 	suite.Nil(err)
 	suite.NotNil(getTodo)
-	suite.Equal(todo.Assignee, getTodo.Assignee)
+	suite.Equal(todo.Assignee, updatedTodo.Assignee)
 
 	// List_Test_Part
 	listTodos, _, err := suite.Repository.List(1, 2)
