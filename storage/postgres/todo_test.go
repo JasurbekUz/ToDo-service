@@ -8,6 +8,11 @@ import (
 	pb "github.com/JasurbekUz/ToDo-service/genproto"
 )
 
+var (
+	Id_1 = "f6b409cc-8520-4532-4d80-a6c7a6092a8c"
+	Id_2 = "5cd22b4d-29fd-4a78-4cc6-cd3af539c363"
+)
+
 func TestTodoRepo_Create(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -18,16 +23,18 @@ func TestTodoRepo_Create(t *testing.T) {
 		{
 			name: "successful",
 			input: pb.Todo{
-				Assignee: "assignee",
-				Title:    "title",
-				Summary:  "summary",
+				Id:       Id_1,
+				Assignee: "assignee_1",
+				Title:    "title_1",
+				Summary:  "summary_1",
 				Deadline: "2021-12-15T14:12:14Z",
 				Status:   "active",
 			},
 			want: pb.Todo{
-				Assignee: "assignee",
-				Title:    "title",
-				Summary:  "summary",
+				Id:       Id_1,
+				Assignee: "assignee_1",
+				Title:    "title_1",
+				Summary:  "summary_1",
 				Deadline: "2021-12-15T14:12:14Z",
 				Status:   "active",
 			},
@@ -36,14 +43,16 @@ func TestTodoRepo_Create(t *testing.T) {
 		{
 			name: "successful",
 			input: pb.Todo{
-				Assignee: "assigne_2",
+				Id:       Id_2,
+				Assignee: "assignee_2",
 				Title:    "title_2",
 				Summary:  "summary_2",
 				Deadline: "2021-12-18T18:00:10Z",
 				Status:   "active",
 			},
 			want: pb.Todo{
-				Assignee: "assigne_2",
+				Id:       Id_2,
+				Assignee: "assignee_2",
 				Title:    "title_2",
 				Summary:  "summary_2",
 				Deadline: "2021-12-18T18:00:10Z",
@@ -59,7 +68,7 @@ func TestTodoRepo_Create(t *testing.T) {
 			if err != nil {
 				t.Fatalf("%s: expected: %v, got: %v", tc.name, tc.wantErr, err)
 			}
-			got.Id = 0
+
 			if !reflect.DeepEqual(tc.want, got) {
 				t.Fatalf("%s: expected: %v, got: %v", tc.name, tc.want, got)
 			}
@@ -70,18 +79,18 @@ func TestTodoRepo_Create(t *testing.T) {
 func TestTodoRepo_Get(t *testing.T) {
 	tests := []struct {
 		name    string
-		input   int64
+		input   string
 		want    pb.Todo
 		wantErr bool
 	}{
 		{
 			name:  "successful",
-			input: 1,
+			input: Id_1,
 			want: pb.Todo{
-				Id:       1,
-				Assignee: "assignee",
-				Title:    "title",
-				Summary:  "summary",
+				Id:       Id_1,
+				Assignee: "assignee_1",
+				Title:    "title_1",
+				Summary:  "summary_1",
 				Deadline: "2021-12-15T14:12:14Z",
 				Status:   "active",
 			},
@@ -121,19 +130,19 @@ func TestTodoRepo_List(t *testing.T) {
 			},
 			want: []*pb.Todo{
 				{
-					Id:       1,
-					Assignee: "assignee",
-					Title:    "title",
-					Summary:  "summary",
+					Id:       Id_1,
+					Assignee: "assignee_1",
+					Title:    "title_1",
+					Summary:  "summary_1",
 					Deadline: "2021-12-15T14:12:14Z",
 					Status:   "active",
 				},
 				{
-					Id:       2,
+					Id:       Id_2,
 					Assignee: "assignee_2",
 					Title:    "title_2",
 					Summary:  "summary_2",
-					Deadline: "2021-12-15T14:12:14Z",
+					Deadline: "2021-12-18T18:00:10Z",
 					Status:   "active",
 				},
 			},
@@ -164,17 +173,18 @@ func TestTodoRepo_Update(t *testing.T) {
 		{
 			name: "successful",
 			input: pb.Todo{
-				Id:       1,
-				Assignee: "assignee",
-				Title:    "title",
-				Summary:  "summary",
+				Id:       Id_2,
+				Assignee: "assignee_2",
+				Title:    "title_2",
+				Summary:  "summary_2",
 				Deadline: "2021-12-15T14:12:14Z",
 				Status:   "active",
 			},
 			want: pb.Todo{
-				Assignee: "assignee",
-				Title:    "title",
-				Summary:  "summary",
+				Id:       Id_2,
+				Assignee: "assignee_2",
+				Title:    "title_2",
+				Summary:  "summary_2",
 				Deadline: "2021-12-15T14:12:14Z",
 				Status:   "active",
 			},
@@ -188,7 +198,7 @@ func TestTodoRepo_Update(t *testing.T) {
 			if err != nil {
 				t.Fatalf("%s: expected: %v, got: %v", tc.name, tc.wantErr, err)
 			}
-			got.Id = 0
+
 			if !reflect.DeepEqual(tc.want, got) {
 				t.Fatalf("%s: expected: %v, got: %v", tc.name, tc.want, got)
 			}
@@ -199,13 +209,13 @@ func TestTodoRepo_Update(t *testing.T) {
 func TestTodoRepo_Delete(t *testing.T) {
 	tests := []struct {
 		name    string
-		input   int64
+		input   string
 		want    error
 		wantErr bool
 	}{
 		{
 			name:    "successful",
-			input:   2,
+			input:   Id_2,
 			want:    nil,
 			wantErr: false,
 		},
@@ -248,19 +258,19 @@ func TestTodoRepo_ListOverdue(t *testing.T) {
 			},
 			want: []*pb.Todo{
 				{
-					Id:       1,
-					Assignee: "assignee",
-					Title:    "title",
-					Summary:  "summary",
+					Id:       Id_1,
+					Assignee: "assignee_1",
+					Title:    "title_1",
+					Summary:  "summary_1",
 					Deadline: "2021-12-15T14:12:14Z",
 					Status:   "active",
 				},
 				{
-					Id:       2,
+					Id:       Id_2,
 					Assignee: "assignee_2",
 					Title:    "title_2",
 					Summary:  "summary_2",
-					Deadline: "2021-12-15T14:12:14Z",
+					Deadline: "2021-12-18T18:00:10Z",
 					Status:   "active",
 				},
 			},
