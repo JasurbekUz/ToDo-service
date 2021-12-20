@@ -8,7 +8,7 @@ service TodoService {
     rpc List(ListReq) returns (ListResp);
     rpc Update(Todo) returns (Todo);
     rpc Delete(ByIdReq) returns (Empty);
-    rpc ListOverdue(ListTime) returns(ListResp);
+    rpc ListOverdue(ListTime) returns (ListResp);
 }
 
 message Empty {}
