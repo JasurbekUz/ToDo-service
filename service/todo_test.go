@@ -2,84 +2,257 @@ package service
 
 import (
 	"context"
+	"reflect"
 	"testing"
 
 	pb "github.com/JasurbekUz/ToDo-service/genproto"
 )
 
 var (
-	id   string
-	todo *pb.Todo
-	err  error
+	ids [2]string
+	index int
+	Id string
 )
 
 func TestTodoService_Create(t *testing.T) {
-	todo, err = client.Create(context.Background(), &pb.Todo{
-		Assignee: "assignee_3",
-		Title:    "title_3",
-		Summary:  "summary_3",
-		Deadline: "2021-12-20",
-		Status:   "status_3",
-	})
-
-	if err != nil {
-		t.Error(err)
+	tests := []struct {
+		name  string
+		input pb.Todo
+		want  pb.Todo
+	}{
+		{
+			name: "successful",
+			input: pb.Todo{
+				Assignee: "assignee_1",
+				Title:    "title_1",
+				Summary:  "summary_1",
+				Deadline: "2021-12-15T14:12:14Z",
+				Status:   "active",
+			},
+			want: pb.Todo{
+				Assignee: "assignee_1",
+				Title:    "title_1",
+				Summary:  "summary_1",
+				Deadline: "2021-12-15T14:12:14Z",
+				Status:   "active",
+			},
+		},
 	}
 
-	id = todo.Id
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := client.Create(context.Background(), &tc.input)
+			if err != nil {
+				t.Error("failed to create todo", err)
+			}
+
+			ids[index] = got.Id
+			index++
+
+			got.Id = ""
+			if !reflect.DeepEqual(tc.want, *got) {
+				t.Fatalf("%s: expected: %v, got: %v", tc.name, tc.want, got)
+			}
+		})
+	}
+	Id = ids[0]
 }
 
 func TestTodoService_Get(t *testing.T) {
-	_, err := client.Get(context.Background(), &pb.ByIdReq{
-		Id: id,
-	})
-	if err != nil {
-		t.Error(err)
+	tests := []struct {
+		name  string
+		input string
+		want  pb.Todo
+	}{
+		{
+			name:  "successful",
+			input: Id,
+			want: pb.Todo{
+				Assignee: "assignee_1",
+				Title:    "title_1",
+				Summary:  "summary_1",
+				Deadline: "2021-12-15T14:12:14Z",
+				Status:   "active",
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := client.Get(context.Background(), &pb.ByIdReq{Id: tc.input})
+			if err != nil {
+				t.Error("failed to get todo", err)
+			}
+			got.Id = ""
+			tc.want.CreatedAt = got.CreatedAt
+			tc.want.UpdatedAt = got.UpdatedAt
+			if !reflect.DeepEqual(tc.want, *got) {
+				t.Fatalf("%s: expected: %v, got: %v", tc.name, tc.want, got)
+			}
+		})
 	}
 }
 
 func TestTodoService_Update(t *testing.T) {
-	_, err := client.Update(context.Background(), &pb.Todo{
-		Id:       id,
-		Assignee: "assignee_edited",
-		Title:    "title_edited",
-		Summary:  "summary_edited",
-		Deadline: "2021-12-20",
-		Status:   "status_edited",
-	})
-	if err != nil {
-		t.Error(err)
+	tests := []struct {
+		name  string
+		input pb.Todo
+		want  pb.Todo
+	}{
+		{
+			name: "successful",
+			input: pb.Todo{
+				Id:       Id,
+				Assignee: "assignee_1",
+				Title:    "title_1",
+				Summary:  "summary_1",
+				Deadline: "2021-12-15T14:12:14Z",
+				Status:   "active",
+			},
+			want: pb.Todo{
+				Assignee: "assignee_edited",
+				Title:    "title_edited",
+				Summary:  "summary_edited",
+				Deadline: "2021-12-18T18:00:10Z",
+				Status:   "active",
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := client.Update(context.Background(), &tc.input)
+			if err != nil {
+				t.Error("failed to update todo", err)
+			}
+			got.Id = ""
+			tc.want.CreatedAt = got.CreatedAt
+			tc.want.UpdatedAt = got.UpdatedAt
+			if !reflect.DeepEqual(tc.want, *got) {
+				t.Fatalf("%s: expected:%v got:%v", tc.name, tc.want, got)
+			}
+		})
 	}
 }
 
 func TestTodoService_List(t *testing.T) {
-	_, err := client.List(context.Background(), &pb.ListReq{
-		Page:  2,
-		Limit: 1,
-	})
-	if err != nil {
-		t.Error(err)
+	tests := []struct {
+		name  string
+		input struct {
+			page, limit int64
+		}
+		wants []*pb.Todo
+	}{
+		{
+			name: "succesful",
+			input: struct {
+				page, limit int64
+			}{
+				page:  1,
+				limit: 1,
+			},
+			wants: []*pb.Todo{
+				{
+					Assignee: "assignee_edited",
+					Title:    "title_edited",
+					Summary:  "summary_edited",
+					Deadline: "2021-12-18T18:00:10Z",
+					Status:   "active",
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			listReq := &pb.ListReq{
+				Limit: tc.input.limit,
+				Page:  tc.input.page,
+			}
+			got, err := client.List(context.Background(), listReq)
+			if err != nil {
+				t.Error("failed to list todo", err)
+			}
+			for i, want := range tc.wants {
+				got.Todos[i].Id = ""
+				want.CreatedAt = got.Todos[i].CreatedAt
+				want.UpdatedAt = got.Todos[i].UpdatedAt
+				if !reflect.DeepEqual(want, got.Todos[i]) {
+					t.Fatalf("%s: expected:%v got:%v", tc.name, want, got.Todos[i])
+				}
+			}
+		})
 	}
 }
 
 func TestTodoService_ListOverdue(t *testing.T) {
-	_, err := client.ListOverdue(context.Background(), &pb.ListTime{
-		ListPage: &pb.ListReq{
-			Page:  2,
-			Limit: 1,
+	tests := []struct {
+		name  string
+		input *pb.ListTime
+		wants []*pb.Todo
+	}{
+		{
+			name: "succesful",
+			input: &pb.ListTime{
+				ListPage: &pb.ListReq{
+					Page:  1,
+					Limit: 1,
+				},
+				ToTime: "2021-12-04",
+			},
+			wants: []*pb.Todo{
+				{
+					Assignee: "assignee_edited",
+					Title:    "title_edited",
+					Summary:  "summary_edited",
+					Deadline: "2021-12-18T18:00:10Z",
+					Status:   "active",
+				},
+			},
 		},
-		ToTime: "2021-12-19",
-	})
-	if err != nil {
-		t.Error(err)
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := client.ListOverdue(context.Background(), tc.input)
+			if err != nil {
+				t.Error("failed to listOverdue todo", err)
+			}
+			for i, want := range tc.wants {
+				got.Todos[i].Id = ""
+				want.CreatedAt = got.Todos[i].CreatedAt
+				want.UpdatedAt = got.Todos[i].UpdatedAt
+				if !reflect.DeepEqual(want, got.Todos[i]) {
+					t.Fatalf("%s: expected:%v got:%v", tc.name, want, got.Todos[i])
+				}
+			}
+		})
 	}
 }
 
 func TestTodoService_Delete(t *testing.T) {
-	_, err := client.Delete(context.Background(), &pb.ByIdReq{
-		Id: id,
-	})
-	if err != nil {
-		t.Error(err)
+	tests := []struct {
+		name  string
+		input string
+		want  pb.Empty
+	}{
+		{
+			name:  "successful",
+			input: Id,
+			want:  pb.Empty{},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := client.Delete(context.Background(), &pb.ByIdReq{Id: tc.input})
+			if err != nil {
+				t.Error("failed to delete todo", err)
+			}
+			if !reflect.DeepEqual(tc.want, *got) {
+				t.Fatalf("%s: expected:%v got:%v", tc.name, tc.want, got)
+			}
+		})
 	}
 }
+
