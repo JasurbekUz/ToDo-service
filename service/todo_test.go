@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	ids [2]string
-	index int
+	ids        [2]string
+	index      int
 	Id_1, Id_2 string
 )
 
@@ -36,7 +36,7 @@ func TestTodoService_Create(t *testing.T) {
 				Deadline: "2021-12-15T14:12:14Z",
 				Status:   "active",
 			},
-		},{
+		}, {
 			name: "successful",
 			input: pb.Todo{
 				Assignee: "assignee_2",
@@ -91,7 +91,7 @@ func TestTodoService_Get(t *testing.T) {
 				Deadline: "2021-12-15T14:12:14Z",
 				Status:   "active",
 			},
-		},{
+		}, {
 			name:  "successful",
 			input: Id_2,
 			want: pb.Todo{
@@ -160,7 +160,7 @@ func TestTodoService_Update(t *testing.T) {
 	}
 }
 
-/*func TestTodoService_List(t *testing.T) {
+func TestTodoService_List(t *testing.T) {
 	tests := []struct {
 		name  string
 		input struct {
@@ -181,7 +181,7 @@ func TestTodoService_Update(t *testing.T) {
 					Assignee: "assignee_edited",
 					Title:    "title_edited",
 					Summary:  "summary_edited",
-					Deadline: "2021-12-18T18:00:10Z",
+					Deadline: "2021-12-15T14:12:14Z",
 					Status:   "active",
 				},
 			},
@@ -230,7 +230,7 @@ func TestTodoService_ListOverdue(t *testing.T) {
 					Assignee: "assignee_edited",
 					Title:    "title_edited",
 					Summary:  "summary_edited",
-					Deadline: "2021-12-18T18:00:10Z",
+					Deadline: "2021-12-15T14:12:14Z",
 					Status:   "active",
 				},
 			},
@@ -253,7 +253,7 @@ func TestTodoService_ListOverdue(t *testing.T) {
 			}
 		})
 	}
-}*/
+}
 
 func TestTodoService_Delete(t *testing.T) {
 	tests := []struct {
@@ -265,7 +265,7 @@ func TestTodoService_Delete(t *testing.T) {
 			name:  "successful",
 			input: Id_1,
 			want:  pb.Empty{},
-		},{
+		}, {
 			name:  "successful",
 			input: Id_2,
 			want:  pb.Empty{},
@@ -284,4 +284,3 @@ func TestTodoService_Delete(t *testing.T) {
 		})
 	}
 }
-
